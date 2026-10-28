@@ -123,7 +123,7 @@ export function useChat(myUid, otherUid) {
     // Email the other person (only if they have one)
     if (otherEmail) {
       sendEmail(otherEmail, otherName, `New message from ${myName} 💬`,
-        `Hi ${otherName},\n\n${myName} sent you a message on TutorTracker:\n\n"${previewText}"\n\nLog in to TutorTracker to reply.`
+        `Hi ${otherName},\n\n${myName} sent you a message on Shahmikh Classroom:\n\n"${previewText}"\n\nLog in to Shahmikh Classroom to reply.`
       );
     }
   };
@@ -179,7 +179,7 @@ export function ChatWindow({ myUid, otherUid, otherName, myName, otherEmail }) {
   return (
     <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
       <div style={{ padding: "16px 20px", borderBottom: "1px solid var(--border)", display: "flex", alignItems: "center", gap: 12 }}>
-        <div className="user-avatar" style={{ width: 36, height: 36, fontSize: 14, background: "#3d8ef0" }}>
+        <div className="user-avatar" style={{ width: 36, height: 36, fontSize: 14, background: "#1D3A66" }}>
           {otherName?.charAt(0)?.toUpperCase()}
         </div>
         <div style={{ fontWeight: 600, fontSize: 15 }}>{otherName}</div>

@@ -3,6 +3,7 @@ import { auth, db } from "../firebase/config";
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from "firebase/auth";
 import { ref, set, get } from "firebase/database";
 import toast from "react-hot-toast";
+import Icon from "../components/Icons";
 
 export default function Login() {
   const [mode, setMode] = useState("login"); // login | register
@@ -44,40 +45,54 @@ export default function Login() {
 
   return (
     <div className="login-page">
-      <div className="login-card">
-        <div className="login-logo">
-          <div className="logo-mark">🎓</div>
-          <h1>TutorTracker</h1>
-          <p>Your shared learning workspace</p>
+      <div className="login-hero">
+        <div className="brand"><img src="/logo.svg" alt="" /><span>Shahmikh Classroom</span></div>
+        <div>
+          <h2>Learn tech, <em>one lesson</em> at a time.</h2>
+          <p className="sub">Your lessons, assignments, study materials and progress, all in one friendly place.</p>
         </div>
-
-        <div className="login-tabs">
-          <button className={mode === "login" ? "active" : ""} onClick={() => { setMode("login"); setError(""); }}>Sign In</button>
-          <button className={mode === "register" ? "active" : ""} onClick={() => { setMode("register"); setError(""); }}>Create Account</button>
+        <div className="hero-points">
+          <div className="hero-point"><span className="ico"><Icon name="sessions" size={18} /></span>Book lessons in your own timezone</div>
+          <div className="hero-point"><span className="ico"><Icon name="assignments" size={18} /></span>Assignments, grades and feedback in one place</div>
+          <div className="hero-point"><span className="ico"><Icon name="messages" size={18} /></span>Message your tutor any time</div>
         </div>
-
-        {error && <div className="error-msg">{error}</div>}
-
-        {mode === "register" && (
-          <div className="form-group">
-            <label>Full Name</label>
-            <input name="name" placeholder="e.g. John Smith" value={form.name} onChange={handle} />
+      </div>
+      <div className="login-side">
+        <div className="login-card">
+          <div className="login-logo">
+            <h1>{mode === "login" ? "Welcome back" : "Create your account"}</h1>
+            <p>{mode === "login" ? "Sign in to your classroom." : "Join Shahmikh Classroom as a student."}</p>
           </div>
-        )}
 
-        <div className="form-group">
-          <label>Email</label>
-          <input name="email" type="email" placeholder="you@example.com" value={form.email} onChange={handle} onKeyDown={e => e.key === "Enter" && submit()} />
+          <div className="login-tabs">
+            <button className={mode === "login" ? "active" : ""} onClick={() => { setMode("login"); setError(""); }}>Sign In</button>
+            <button className={mode === "register" ? "active" : ""} onClick={() => { setMode("register"); setError(""); }}>Create Account</button>
+          </div>
+
+          {error && <div className="error-msg">{error}</div>}
+
+          {mode === "register" && (
+            <div className="form-group">
+              <label>Full name</label>
+              <input name="name" placeholder="e.g. John Smith" value={form.name} onChange={handle} />
+            </div>
+          )}
+
+          <div className="form-group">
+            <label>Email</label>
+            <input name="email" type="email" placeholder="you@example.com" value={form.email} onChange={handle} onKeyDown={e => e.key === "Enter" && submit()} />
+          </div>
+
+          <div className="form-group">
+            <label>Password</label>
+            <input name="password" type="password" placeholder="••••••••" value={form.password} onChange={handle} onKeyDown={e => e.key === "Enter" && submit()} />
+          </div>
+
+          <button className="btn-primary" onClick={submit} disabled={loading}>
+            {loading ? "Please wait..." : mode === "login" ? "Sign In" : "Create Account"}
+          </button>
+          <div className="login-foot">By Shahmikh Ali · <a href="https://shahmikh.com" target="_blank" rel="noreferrer">shahmikh.com</a></div>
         </div>
-
-        <div className="form-group">
-          <label>Password</label>
-          <input name="password" type="password" placeholder="••••••••" value={form.password} onChange={handle} onKeyDown={e => e.key === "Enter" && submit()} />
-        </div>
-
-        <button className="btn-primary" onClick={submit} disabled={loading}>
-          {loading ? "Please wait..." : mode === "login" ? "Sign In" : "Create Account"}
-        </button>
       </div>
     </div>
   );

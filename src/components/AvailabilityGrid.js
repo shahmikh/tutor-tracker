@@ -102,7 +102,7 @@ export function AvailabilityGridEditor({ value, onChange, maxHeight = 480 }) {
                 style={{
                   height: ROW_HEIGHT,
                   background: painted ? "var(--accent-blue)" : "var(--bg-secondary)",
-                  borderBottom: isHourLine ? "1px solid var(--border)" : "1px solid rgba(255,255,255,0.03)",
+                  borderBottom: isHourLine ? "1px solid var(--border)" : "1px solid rgba(11,31,58,0.06)",
                   cursor: "pointer",
                   transition: "background 0.05s"
                 }}
@@ -269,7 +269,7 @@ export function AvailabilityGridViewer({ availabilityMap, onSlotClick, selectedS
                 return (
                   <div key={row} style={{
                     position: "absolute", top: idx * ROW_HEIGHT, left: 0, right: 0, height: ROW_HEIGHT,
-                    borderBottom: row % 2 === 0 ? "1px solid var(--border)" : "1px solid rgba(255,255,255,0.03)"
+                    borderBottom: row % 2 === 0 ? "1px solid var(--border)" : "1px solid rgba(11,31,58,0.06)"
                   }}/>
                 );
               })}
@@ -309,8 +309,8 @@ export function AvailabilityGridViewer({ availabilityMap, onSlotClick, selectedS
                       top: visibleStartRow * ROW_HEIGHT + 2,
                       left: 3, right: 3,
                       height: Math.max(visibleSpan * ROW_HEIGHT - 4, 14),
-                      background: isSelected ? "var(--accent-teal)" : "rgba(61,142,240,0.7)",
-                      border: isSelected ? "2px solid var(--accent-teal)" : "1px solid rgba(61,142,240,0.95)",
+                      background: isSelected ? "var(--accent-teal)" : "rgba(29,58,102,0.88)",
+                      border: isSelected ? "2px solid var(--accent-teal)" : "1px solid rgba(29,58,102,1)",
                       borderRadius: 5,
                       cursor: "pointer",
                       display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",

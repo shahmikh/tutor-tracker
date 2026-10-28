@@ -3,6 +3,8 @@ import { db } from "../firebase/config";
 import { ref, onValue, set, push } from "firebase/database";
 import { useAuth } from "../context/AuthContext";
 import Sidebar from "../components/Sidebar";
+import Topbar from "../components/Topbar";
+import CountUp from "../components/CountUp";
 import toast from "react-hot-toast";
 import { format } from "date-fns";
 import { getNextDays, getNextDaysLocal, pktToUtc, formatInLocal, formatInPKT, getLocalTimezone, DAYS, getCountdown } from "../utils/timezone";
@@ -169,7 +171,7 @@ export default function StudentDashboard() {
       notify(db, tutorInfo.uid, `${userProfile.name} rescheduled their session "${topic}" to ${fmt12(selectedSlot.startPKT)} PKT on ${pktDate} 🔄`, "session");
       sendEmail(tutorInfo.email || "", tutorInfo.name,
         `Session Rescheduled 🔄`,
-        `Hi ${tutorInfo.name},\n\n${userProfile.name} has rescheduled their session:\n\nTopic: ${topic}\nNew Time (PKT): ${fmt12(selectedSlot.startPKT)} – ${fmt12(selectedSlot.endPKT)} on ${pktDate}\n\nLog in to TutorTracker to see the updated schedule.`
+        `Hi ${tutorInfo.name},\n\n${userProfile.name} has rescheduled their session:\n\nTopic: ${topic}\nNew Time (PKT): ${fmt12(selectedSlot.startPKT)} – ${fmt12(selectedSlot.endPKT)} on ${pktDate}\n\nLog in to Shahmikh Classroom to see the updated schedule.`
       );
       toast.success("Session rescheduled!");
       setStudentReschedule(null);
@@ -198,7 +200,7 @@ export default function StudentDashboard() {
       notify(db, tutorInfo.uid, `${userProfile.name} booked a session on ${pktDate} at ${fmt12(selectedSlot.startPKT)} PKT 📅`, "session");
       sendEmail(tutorInfo.email || "", tutorInfo.name,
         `New Session Booked 📅`,
-        `Hi ${tutorInfo.name},\n\n${userProfile.name} has booked a session with you.\n\nYour Time (PKT): ${fmt12(selectedSlot.startPKT)} – ${fmt12(selectedSlot.endPKT)} on ${pktDate}\nDuration: ${selectedSlot.duration} minutes\n\nLog in to TutorTracker to manage your sessions.`
+        `Hi ${tutorInfo.name},\n\n${userProfile.name} has booked a session with you.\n\nYour Time (PKT): ${fmt12(selectedSlot.startPKT)} – ${fmt12(selectedSlot.endPKT)} on ${pktDate}\nDuration: ${selectedSlot.duration} minutes\n\nLog in to Shahmikh Classroom to manage your sessions.`
       );
       toast.success("Session booked successfully!");
     }
@@ -241,7 +243,7 @@ export default function StudentDashboard() {
         tutorInfo.email || "",
         tutorInfo.name,
         `Assignment Submitted: ${a.title} ✅`,
-        `Hi ${tutorInfo.name},\n\n${userProfile.name} has submitted the assignment "${a.title}".\n\n${submitNote ? `Student note: ${submitNote}\n\n` : ""}${pdfName ? `PDF attached: ${pdfName}\n\n` : ""}Log in to TutorTracker to review and grade it.`
+        `Hi ${tutorInfo.name},\n\n${userProfile.name} has submitted the assignment "${a.title}".\n\n${submitNote ? `Student note: ${submitNote}\n\n` : ""}${pdfName ? `PDF attached: ${pdfName}\n\n` : ""}Log in to Shahmikh Classroom to review and grade it.`
       );
     }
 
@@ -256,7 +258,7 @@ export default function StudentDashboard() {
     notify(db, tutorInfo.uid, `${userProfile.name} cancelled their session "${s.topic}" on ${s.date} ❌`, "session");
     sendEmail(tutorInfo.email || "", tutorInfo.name,
       `Session Cancelled ❌`,
-      `Hi ${tutorInfo.name},\n\n${userProfile.name} has cancelled their session:\n\nTopic: ${s.topic}\nOriginal Time (PKT): ${s.utcTimestamp ? formatInPKT(s.utcTimestamp) : s.date}\n\nLog in to TutorTracker to manage your schedule.`
+      `Hi ${tutorInfo.name},\n\n${userProfile.name} has cancelled their session:\n\nTopic: ${s.topic}\nOriginal Time (PKT): ${s.utcTimestamp ? formatInPKT(s.utcTimestamp) : s.date}\n\nLog in to Shahmikh Classroom to manage your schedule.`
     );
     toast.success("Session cancelled.");
     setStudentCancel(null);
@@ -282,7 +284,7 @@ export default function StudentDashboard() {
       notify(db, tutorInfo.uid, `${userProfile.name} uploaded payment proof for ${proofModal.month} ✅`, "payment");
       sendEmail(tutorInfo.email || "", tutorInfo.name,
         `Payment Proof Uploaded: ${proofModal.month} ✅`,
-        `Hi ${tutorInfo.name},\n\n${userProfile.name} has uploaded payment proof for the ${proofModal.month} invoice (${proofModal.currency}${proofModal.amount}).\n\nLog in to TutorTracker to view it.`
+        `Hi ${tutorInfo.name},\n\n${userProfile.name} has uploaded payment proof for the ${proofModal.month} invoice (${proofModal.currency}${proofModal.amount}).\n\nLog in to Shahmikh Classroom to view it.`
       );
     }
     toast.success("Payment proof uploaded!");
@@ -303,18 +305,38 @@ export default function StudentDashboard() {
     <div className="app-layout">
       <Sidebar active={page} onNav={setPage} unreadCount={unread} unreadMessages={unreadMessages} />
       <div className="main-content">
+        <Topbar page={page} onNav={setPage} unreadCount={unread} unreadMessages={unreadMessages} />
+        <div className="page-body">
 
         {/* DASHBOARD */}
         {page === "dashboard" && (
           <>
             <div className="page-header">
-              <h1>Welcome, {userProfile?.name?.split(" ")[0]} 👋</h1>
+              <h1>Welcome back, {userProfile?.name?.split(" ")[0]}</h1>
               <p>Your learning dashboard{tutorInfo ? ` · Tutor: ${tutorInfo.name}` : ""} · Times shown in <strong style={{color:"var(--accent-teal)"}}>{localTZ}</strong></p>
             </div>
+            {(() => {
+              const next = [...upcomingSessions].filter(x => (x.utcTimestamp||0) > Date.now()-3600000).sort((a,b) => (a.utcTimestamp||0) - (b.utcTimestamp||0))[0];
+              return (
+                <div className="hero-card">
+                  <div style={{position:"relative",zIndex:1}}>
+                    <div className="eyebrow">{next ? "Your next lesson" : "Ready to learn?"}</div>
+                    <h2>{next ? next.topic : "Book your next lesson"}</h2>
+                    <p>{next ? `${next.utcTimestamp ? formatInLocal(next.utcTimestamp) : next.date} · ${next.duration} min${tutorInfo ? ` · with ${tutorInfo.name}` : ""}` : "Pick a time that works for you in your own timezone."}</p>
+                    {next && next.utcTimestamp && <div className="countdown"><span className="live"></span>Starts {getCountdown(next.utcTimestamp)}</div>}
+                  </div>
+                  <div className="cta">
+                    {tutorInfo && <button className="btn-hero" onClick={() => setBookModal(true)}>Book a lesson</button>}
+                    <button className="btn-hero ghost" onClick={() => setPage("assignments")}>My assignments</button>
+                  </div>
+                </div>
+              );
+            })()}
+
             <div className="stats-row">
-              <div className="stat-card"><div className="stat-label">Pending</div><div className="stat-value color-rose">{pending}</div><div className="stat-sub">Assignments due</div></div>
-              <div className="stat-card"><div className="stat-label">Submitted</div><div className="stat-value color-amber">{submitted}</div><div className="stat-sub">Awaiting grade</div></div>
-              <div className="stat-card"><div className="stat-label">Sessions</div><div className="stat-value color-blue">{upcomingSessions.length}</div><div className="stat-sub">Upcoming</div></div>
+              <div className="stat-card"><div className="stat-label">Pending</div><div className="stat-value color-rose"><CountUp value={pending} /></div><div className="stat-sub">Assignments due</div></div>
+              <div className="stat-card"><div className="stat-label">Submitted</div><div className="stat-value color-amber"><CountUp value={submitted} /></div><div className="stat-sub">Awaiting grade</div></div>
+              <div className="stat-card"><div className="stat-label">Sessions</div><div className="stat-value color-blue"><CountUp value={upcomingSessions.length} /></div><div className="stat-sub">Upcoming</div></div>
               <div className="stat-card"><div className="stat-label">Avg Score</div><div className="stat-value color-teal">{avg!=null?`${avg}%`:"—"}</div><div className="stat-sub">Overall performance</div></div>
             </div>
             <div className="grid-2">
@@ -465,7 +487,7 @@ export default function StudentDashboard() {
                         <>
                           <svg viewBox={`0 0 ${trend.length*50} 100`} style={{width:"100%",height:100,overflow:"visible"}}>
                             {[0,25,50,75,100].map(y=>(
-                              <line key={y} x1={0} y1={100-(y)} x2={trend.length*50} y2={100-(y)} stroke="rgba(255,255,255,0.05)" strokeWidth={1}/>
+                              <line key={y} x1={0} y1={100-(y)} x2={trend.length*50} y2={100-(y)} stroke="rgba(11,31,58,0.08)" strokeWidth={1}/>
                             ))}
                             <polyline
                               points={trend.map((d,i)=>`${i*50+25},${100-(d.score)}`).join(" ")}
@@ -492,7 +514,7 @@ export default function StudentDashboard() {
                     {(() => {
                       const bands = [
                         {label:"90-100%",min:90,max:101,color:"var(--accent-teal)"},
-                        {label:"70-89%",min:70,max:90,color:"#3d8ef0"},
+                        {label:"70-89%",min:70,max:90,color:"#1D3A66"},
                         {label:"50-69%",min:50,max:70,color:"var(--accent-amber)"},
                         {label:"<50%",min:0,max:50,color:"var(--accent-rose)"},
                       ];
@@ -716,6 +738,7 @@ export default function StudentDashboard() {
             </div>
           </>
         )}
+        </div>
       </div>
 
       {/* MODAL: Cancel Confirmation (Student) */}

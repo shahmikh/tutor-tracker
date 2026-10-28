@@ -3,6 +3,8 @@ import { db } from "../firebase/config";
 import { ref, onValue, push, set, remove } from "firebase/database";
 import { useAuth } from "../context/AuthContext";
 import Sidebar from "../components/Sidebar";
+import Topbar from "../components/Topbar";
+import CountUp from "../components/CountUp";
 import toast from "react-hot-toast";
 import { format } from "date-fns";
 import { DAYS, formatInPKT, formatTimePKT, formatInLocal, pktToUtc, getNextDays, getCountdown } from "../utils/timezone";
@@ -165,7 +167,7 @@ export default function TutorDashboard() {
     notify(db, studentId, `New invoice for ${month}: ${currency}${amount} 💳`, "invoice");
     if (student?.email) sendEmail(student.email, student.name,
       `Invoice for ${month} 💳`,
-      `Hi ${student.name},\n\nYour tutor ${userProfile.name} has created an invoice.\n\nMonth: ${month}\nAmount: ${currency}${amount}\n${notes ? `Notes: ${notes}\n` : ""}\nLog in to TutorTracker to view details and upload your payment proof.`
+      `Hi ${student.name},\n\nYour tutor ${userProfile.name} has created an invoice.\n\nMonth: ${month}\nAmount: ${currency}${amount}\n${notes ? `Notes: ${notes}\n` : ""}\nLog in to Shahmikh Classroom to view details and upload your payment proof.`
     );
     toast.success("Invoice created!");
     setInvoiceForm({ studentId: "", month: "", amount: "", currency: "$", notes: "" });
@@ -194,7 +196,7 @@ export default function TutorDashboard() {
       const stu = students.find(s => s.id === sid);
       if (stu?.email) sendEmail(stu.email, stu.name,
         `New Class Package: ${name} 🎟️`,
-        `Hi ${stu.name},\n\nA new class package has been set up for you${studentIds.length > 1 ? " (shared)" : ""}.\n\nPackage: ${name}\nTotal Classes: ${totalClasses}\n${note ? `Note: ${note}\n` : ""}\nLog in to TutorTracker to track classes remaining.`
+        `Hi ${stu.name},\n\nA new class package has been set up for you${studentIds.length > 1 ? " (shared)" : ""}.\n\nPackage: ${name}\nTotal Classes: ${totalClasses}\n${note ? `Note: ${note}\n` : ""}\nLog in to Shahmikh Classroom to track classes remaining.`
       );
     }
 
@@ -221,7 +223,7 @@ export default function TutorDashboard() {
       const stu = students.find(s => s.id === sid);
       if (stu?.email) sendEmail(stu.email, stu.name,
         `Classes Added to ${pkg.name} 🎟️`,
-        `Hi ${stu.name},\n\n${extra} more classes have been added to your package "${pkg.name}".\n\nNew Total: ${newTotal} classes\n${topUpNote.trim() ? `Note: ${topUpNote.trim()}\n` : ""}\nLog in to TutorTracker to see your updated package.`
+        `Hi ${stu.name},\n\n${extra} more classes have been added to your package "${pkg.name}".\n\nNew Total: ${newTotal} classes\n${topUpNote.trim() ? `Note: ${topUpNote.trim()}\n` : ""}\nLog in to Shahmikh Classroom to see your updated package.`
       );
     }
     toast.success(`${extra} classes added! New total: ${newTotal}`);
@@ -339,7 +341,7 @@ export default function TutorDashboard() {
       notify(db, sid, `${userProfile.name} scheduled a session: "${topic}" on ${date} at ${fmt12(slotStartPKT)} PKT 📅`, "session");
       if (stu?.email) sendEmail(stu.email, stu.name,
         `New Session Scheduled: "${topic}" 📅`,
-        `Hi ${stu.name},\n\nYour tutor ${userProfile.name} has scheduled a session with you${isShared ? " (shared session)" : ""}.\n\nTopic: ${topic}\nDate: ${date}\nTime (PKT): ${fmt12(slotStartPKT)} – ${fmt12(slotEndPKT)}\nDuration: ${slotDuration} minutes\n\nLog in to TutorTracker to see the time in your own timezone.`
+        `Hi ${stu.name},\n\nYour tutor ${userProfile.name} has scheduled a session with you${isShared ? " (shared session)" : ""}.\n\nTopic: ${topic}\nDate: ${date}\nTime (PKT): ${fmt12(slotStartPKT)} – ${fmt12(slotEndPKT)}\nDuration: ${slotDuration} minutes\n\nLog in to Shahmikh Classroom to see the time in your own timezone.`
       );
     }
 
@@ -357,8 +359,8 @@ export default function TutorDashboard() {
     await set(ref(db, `tutors/${currentUser.uid}/students/${uid}`), { name: profile.name, email: profile.email, addedAt: Date.now() });
     await set(ref(db, `students/${uid}/tutor`), { uid: currentUser.uid, name: userProfile.name, email: userProfile.email });
     notify(db, uid, `${userProfile.name} has added you as their student. Welcome! 🎓`, "welcome");
-    sendEmail(profile.email, profile.name, "Welcome to TutorTracker 🎓",
-      `Hi ${profile.name},\n\nYou have been added as a student by ${userProfile.name} on TutorTracker.\n\nLog in to see your assignments and book sessions.`
+    sendEmail(profile.email, profile.name, "Welcome to Shahmikh Classroom 🎓",
+      `Hi ${profile.name},\n\nYou have been added as a student by ${userProfile.name} on Shahmikh Classroom.\n\nLog in to see your assignments and book sessions.`
     );
     toast.success(`${profile.name} added!`);
     setStudentEmail(""); setShowAddStudent(false);
@@ -383,7 +385,7 @@ export default function TutorDashboard() {
     const stuData = students.find(s => s.id === assignForm.studentId);
     if (stuData?.email) sendEmail(stuData.email, stuData.name,
       `New Assignment: ${assignForm.title} 📝`,
-      `Hi ${stuData.name},\n\nYour tutor ${userProfile.name} has given you a new assignment:\n\nTitle: ${assignForm.title}\nSubject: ${assignForm.subject}\nDue Date: ${assignForm.dueDate}\n\nDescription: ${assignForm.description || "No description provided."}\n\nLog in to TutorTracker to submit your work.`
+      `Hi ${stuData.name},\n\nYour tutor ${userProfile.name} has given you a new assignment:\n\nTitle: ${assignForm.title}\nSubject: ${assignForm.subject}\nDue Date: ${assignForm.dueDate}\n\nDescription: ${assignForm.description || "No description provided."}\n\nLog in to Shahmikh Classroom to submit your work.`
     );
     toast.success("Assignment sent!");
     setAssignForm({ studentId: "", title: "", subject: "", dueDate: "", description: "", totalMarks: "100" });
@@ -398,7 +400,7 @@ export default function TutorDashboard() {
     const stuEntry = students.find(st => st.id === s.studentId);
     if (stuEntry?.email) sendEmail(stuEntry.email, stuEntry.name,
       `Session Completed ✅`,
-      `Hi ${stuEntry.name},\n\nYour session "${s.topic}" has been marked as completed by ${userProfile.name}.\n\nLog in to TutorTracker to view your progress.`
+      `Hi ${stuEntry.name},\n\nYour session "${s.topic}" has been marked as completed by ${userProfile.name}.\n\nLog in to Shahmikh Classroom to view your progress.`
     );
     toast.success("Session marked complete!");
   };
@@ -427,7 +429,7 @@ export default function TutorDashboard() {
       const stu = students.find(s => s.id === sid);
       if (stu?.email) sendEmail(stu.email, stu.name,
         `New Study Material: ${materialForm.title} 📚`,
-        `Hi ${stu.name},\n\nYour tutor ${userProfile.name} has uploaded a new study material:\n\nTitle: ${materialForm.title}\n${materialForm.description ? `Description: ${materialForm.description}\n` : ""}File: ${materialFile.name}\n\nLog in to TutorTracker to download it.`
+        `Hi ${stu.name},\n\nYour tutor ${userProfile.name} has uploaded a new study material:\n\nTitle: ${materialForm.title}\n${materialForm.description ? `Description: ${materialForm.description}\n` : ""}File: ${materialFile.name}\n\nLog in to Shahmikh Classroom to download it.`
       );
     }
     toast.success("Material uploaded!");
@@ -455,7 +457,7 @@ export default function TutorDashboard() {
       const stuEntry = students.find(st => st.id === sid);
       if (stuEntry?.email) sendEmail(stuEntry.email, stuEntry.name,
         `Session Cancelled ❌`,
-        `Hi ${stuEntry.name},\n\nYour tutor ${userProfile.name} has cancelled the session:\n\nTopic: ${s.topic}\nOriginal Time (PKT): ${s.utcTimestamp ? formatInPKT(s.utcTimestamp) : s.date}\n\nPlease log in to TutorTracker to book a new session.`
+        `Hi ${stuEntry.name},\n\nYour tutor ${userProfile.name} has cancelled the session:\n\nTopic: ${s.topic}\nOriginal Time (PKT): ${s.utcTimestamp ? formatInPKT(s.utcTimestamp) : s.date}\n\nPlease log in to Shahmikh Classroom to book a new session.`
       );
     }
     toast.success("Session cancelled.");
@@ -478,7 +480,7 @@ export default function TutorDashboard() {
       const stuEntry = students.find(st => st.id === sid);
       if (stuEntry?.email) sendEmail(stuEntry.email, stuEntry.name,
         `Session Rescheduled 🔄`,
-        `Hi ${stuEntry.name},\n\nYour tutor ${userProfile.name} has rescheduled your session:\n\nTopic: ${s.topic}\nNew Time (PKT): ${fmt12(slotStartPKT)} on ${date}\n\nLog in to TutorTracker to see the updated time in your timezone.`
+        `Hi ${stuEntry.name},\n\nYour tutor ${userProfile.name} has rescheduled your session:\n\nTopic: ${s.topic}\nNew Time (PKT): ${fmt12(slotStartPKT)} on ${date}\n\nLog in to Shahmikh Classroom to see the updated time in your timezone.`
       );
     }
     toast.success("Session rescheduled!");
@@ -524,7 +526,7 @@ export default function TutorDashboard() {
     const stu = students.find(s => s.id === a.studentId);
     if (stu?.email) sendEmail(stu.email, stu.name,
       `Assignment Graded: ${a.title} 🎯`,
-      `Hi ${stu.name},\n\nYour assignment "${a.title}" has been graded!\n\nScore: ${marks}/${a.totalMarks}\n${gradeForm.feedback ? `Feedback: ${gradeForm.feedback}` : ""}${feedbackPdfName ? `\n\nYour tutor attached a feedback PDF. Log in to download it.` : ""}\n\nLog in to TutorTracker to view your progress.`
+      `Hi ${stu.name},\n\nYour assignment "${a.title}" has been graded!\n\nScore: ${marks}/${a.totalMarks}\n${gradeForm.feedback ? `Feedback: ${gradeForm.feedback}` : ""}${feedbackPdfName ? `\n\nYour tutor attached a feedback PDF. Log in to download it.` : ""}\n\nLog in to Shahmikh Classroom to view your progress.`
     );
     toast.success("Assignment graded!");
     setGradeModal(null); setGradeForm({ marks: "", feedback: "" }); setGradePdf(null);
@@ -548,12 +550,14 @@ export default function TutorDashboard() {
     <div className="app-layout">
       <Sidebar active={page} onNav={setPage} unreadCount={unread} unreadMessages={totalUnreadMessages} />
       <div className="main-content">
+        <Topbar page={page} onNav={setPage} unreadCount={unread} unreadMessages={totalUnreadMessages} />
+        <div className="page-body">
 
         {/* DASHBOARD */}
         {page === "dashboard" && (
           <>
             <div className="page-header">
-              <h1>Good day, {userProfile?.name?.split(" ")[0]} 👋</h1>
+              <h1>Good day, {userProfile?.name?.split(" ")[0]}</h1>
               <p>Your teaching overview · All times shown in <strong style={{color:"var(--accent-teal)"}}>PKT (Pakistan Time)</strong></p>
             </div>
 
@@ -576,11 +580,29 @@ export default function TutorDashboard() {
               );
             })}
 
+            {(() => {
+              const next = [...upcomingSessions].filter(x => (x.utcTimestamp||0) > Date.now()-3600000).sort((a,b) => (a.utcTimestamp||0) - (b.utcTimestamp||0))[0];
+              return (
+                <div className="hero-card">
+                  <div style={{position:"relative",zIndex:1}}>
+                    <div className="eyebrow">{next ? "Next lesson" : "You're all clear"}</div>
+                    <h2>{next ? next.topic : "No lessons scheduled"}</h2>
+                    <p>{next ? `with ${next.studentName} · ${next.utcTimestamp ? formatInPKT(next.utcTimestamp) : next.date}` : "Schedule a lesson with one of your students."}</p>
+                    {next && next.utcTimestamp && <div className="countdown"><span className="live"></span>Starts {getCountdown(next.utcTimestamp)}</div>}
+                  </div>
+                  <div className="cta">
+                    <button className="btn-hero" onClick={() => setPage("sessions")}>{next ? "Open lessons" : "Schedule a lesson"}</button>
+                    <button className="btn-hero ghost" onClick={() => setPage("students")}>My students</button>
+                  </div>
+                </div>
+              );
+            })()}
+
             <div className="stats-row">
-              <div className="stat-card"><div className="stat-label">Students</div><div className="stat-value color-blue">{students.length}</div><div className="stat-sub">Active learners</div></div>
-              <div className="stat-card"><div className="stat-label">Sessions</div><div className="stat-value color-teal">{completedSessions}</div><div className="stat-sub">Completed</div></div>
-              <div className="stat-card"><div className="stat-label">Assignments</div><div className="stat-value color-amber">{assignments.length}</div><div className="stat-sub">Total given</div></div>
-              <div className="stat-card"><div className="stat-label">Pending</div><div className="stat-value color-rose">{pendingAssign}</div><div className="stat-sub">Awaiting submission</div></div>
+              <div className="stat-card"><div className="stat-label">Students</div><div className="stat-value color-blue"><CountUp value={students.length} /></div><div className="stat-sub">Active learners</div></div>
+              <div className="stat-card"><div className="stat-label">Sessions</div><div className="stat-value color-teal"><CountUp value={completedSessions} /></div><div className="stat-sub">Completed</div></div>
+              <div className="stat-card"><div className="stat-label">Assignments</div><div className="stat-value color-amber"><CountUp value={assignments.length} /></div><div className="stat-sub">Total given</div></div>
+              <div className="stat-card"><div className="stat-label">Pending</div><div className="stat-value color-rose"><CountUp value={pendingAssign} /></div><div className="stat-sub">Awaiting submission</div></div>
             </div>
             <div className="grid-2">
               <div className="card">
@@ -610,7 +632,7 @@ export default function TutorDashboard() {
                   ? <div className="empty-state"><div className="empty-icon">🔔</div><p>No activity yet</p></div>
                   : <div className="activity-feed">{notifications.slice(0,6).map(n => (
                     <div key={n.id} className="activity-item">
-                      <div className="activity-dot" style={{background: n.type==="assignment"?"#f0a500":n.type==="session"?"#3d8ef0":"#38c9b0"}}></div>
+                      <div className="activity-dot" style={{background: n.type==="assignment"?"#C98A00":n.type==="session"?"#1D3A66":"#1E9E6A"}}></div>
                       <div><div className="activity-text">{n.message}</div><div className="activity-time">{format(new Date(n.createdAt),"MMM d, h:mm a")}</div></div>
                     </div>
                   ))}</div>
@@ -674,7 +696,7 @@ export default function TutorDashboard() {
                 return (
                   <div key={s.id} className="card">
                     <div style={{display:"flex",alignItems:"center",gap:12,marginBottom:16}}>
-                      <div className="user-avatar" style={{width:44,height:44,fontSize:18,background:"#3d8ef0"}}>{s.name?.charAt(0)?.toUpperCase()}</div>
+                      <div className="user-avatar" style={{width:44,height:44,fontSize:18,background:"#1D3A66"}}>{s.name?.charAt(0)?.toUpperCase()}</div>
                       <div><div style={{fontWeight:600}}>{s.name}</div><div style={{fontSize:12,color:"var(--text-secondary)"}}>{s.email}</div></div>
                     </div>
                     <div style={{marginBottom:8,fontSize:12,color:"var(--text-secondary)",display:"flex",justifyContent:"space-between"}}><span>Assignment completion</span><span>{pct}%</span></div>
@@ -767,7 +789,7 @@ export default function TutorDashboard() {
                         onMouseLeave={e => e.currentTarget.style.borderColor="var(--border)"}
                       >
                         <div style={{display:"flex",alignItems:"center",gap:12,marginBottom:16}}>
-                          <div className="user-avatar" style={{width:44,height:44,fontSize:18,background:"#3d8ef0"}}>{s.name?.charAt(0)?.toUpperCase()}</div>
+                          <div className="user-avatar" style={{width:44,height:44,fontSize:18,background:"#1D3A66"}}>{s.name?.charAt(0)?.toUpperCase()}</div>
                           <div><div style={{fontWeight:600,fontSize:16}}>{s.name}</div><div style={{fontSize:12,color:"var(--text-secondary)"}}>{s.email}</div></div>
                         </div>
                         <div style={{display:"flex",gap:12}}>
@@ -986,7 +1008,7 @@ export default function TutorDashboard() {
                                 <svg viewBox={`0 0 ${scoreTrend.length*40} 80`} style={{width:"100%",height:"100%",overflow:"visible"}}>
                                   {/* Grid lines */}
                                   {[0,25,50,75,100].map(y=>(
-                                    <line key={y} x1={0} y1={80-(y*80/100)} x2={scoreTrend.length*40} y2={80-(y*80/100)} stroke="rgba(255,255,255,0.05)" strokeWidth={1}/>
+                                    <line key={y} x1={0} y1={80-(y*80/100)} x2={scoreTrend.length*40} y2={80-(y*80/100)} stroke="rgba(11,31,58,0.08)" strokeWidth={1}/>
                                   ))}
                                   {/* Line */}
                                   <polyline
@@ -1180,7 +1202,7 @@ export default function TutorDashboard() {
                     const unread = unreadByStudent[s.id] || 0;
                     return (
                       <div key={s.id} className={`chat-list-item ${activeChatStudent?.id===s.id?"active":""}`} onClick={() => setActiveChatStudent(s)}>
-                        <div className="user-avatar" style={{width:36,height:36,fontSize:14,background:"#3d8ef0"}}>{s.name?.charAt(0)?.toUpperCase()}</div>
+                        <div className="user-avatar" style={{width:36,height:36,fontSize:14,background:"#1D3A66"}}>{s.name?.charAt(0)?.toUpperCase()}</div>
                         <div style={{flex:1,minWidth:0}}>
                           <div style={{fontWeight:600,fontSize:13,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{s.name}</div>
                         </div>
@@ -1311,6 +1333,7 @@ export default function TutorDashboard() {
             }
           </>
         )}
+        </div>
       </div>
 
       {/* MODAL: Add Availability */}

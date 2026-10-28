@@ -13,7 +13,7 @@ function AppRoutes() {
   if (loading) return (
     <div className="loading-screen">
       <div className="loader-ring"></div>
-      <p>Loading your workspace...</p>
+      <p>Loading Shahmikh Classroom...</p>
     </div>
   );
 
@@ -37,7 +37,8 @@ export default function App() {
     <AuthProvider>
       <BrowserRouter>
         <Toaster position="top-right" toastOptions={{
-          style: { background: "#1e2a3a", color: "#e8f0fe", border: "1px solid #3d5a80" },
+          style: { background: "#0B1F3A", color: "#fff", borderRadius: "999px", fontFamily: "DM Sans, sans-serif", fontSize: "14px" },
+          success: { iconTheme: { primary: "#FF7A55", secondary: "#fff" } },
           duration: 4000
         }} />
         <AppRoutes />
