@@ -10,8 +10,7 @@
     "react-scripts": "5.0.1",
     "react-hot-toast": "^2.4.1",
     "date-fns": "^3.0.6",
-    "@emailjs/browser": "^4.3.3",
-    "firebase": "^10.7.0"
+    "@emailjs/browser": "^4.3.3"
   },
   "scripts": {
     "start": "react-scripts start",
