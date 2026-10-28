@@ -4,6 +4,7 @@ import { ref, onValue, push, set, remove } from "firebase/database";
 import { useAuth } from "../context/AuthContext";
 import Sidebar from "../components/Sidebar";
 import Topbar from "../components/Topbar";
+import usePage from "../utils/usePage";
 import CountUp from "../components/CountUp";
 import toast from "react-hot-toast";
 import { format } from "date-fns";
@@ -51,7 +52,7 @@ function fmt12(t) {
 
 export default function TutorDashboard() {
   const { currentUser, userProfile } = useAuth();
-  const [page, setPage] = useState("dashboard");
+  const [page, setPage] = usePage(["assignments", "availability", "dashboard", "materials", "messages", "notifications", "packages", "payments", "progress", "sessions", "students"]);
   const [students, setStudents] = useState([]);
   const [sessions, setSessions] = useState([]);
   const [assignments, setAssignments] = useState([]);
@@ -551,7 +552,7 @@ export default function TutorDashboard() {
       <Sidebar active={page} onNav={setPage} unreadCount={unread} unreadMessages={totalUnreadMessages} />
       <div className="main-content">
         <Topbar page={page} onNav={setPage} unreadCount={unread} unreadMessages={totalUnreadMessages} />
-        <div className="page-body">
+        <div className="page-body" key={page}>
 
         {/* DASHBOARD */}
         {page === "dashboard" && (
