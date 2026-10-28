@@ -5,6 +5,7 @@ import { useAuth } from "../context/AuthContext";
 import Sidebar from "../components/Sidebar";
 import Topbar from "../components/Topbar";
 import usePage from "../utils/usePage";
+import useMeetingLink, { joinWindow } from "../utils/useMeetingLink";
 import CountUp from "../components/CountUp";
 import toast from "react-hot-toast";
 import { format } from "date-fns";
@@ -52,6 +53,9 @@ function fmt12(t) {
 
 export default function TutorDashboard() {
   const { currentUser, userProfile } = useAuth();
+  const [meetingLink, saveMeetingLink] = useMeetingLink(currentUser.uid);
+  const [linkDraft, setLinkDraft] = useState(null);
+  const [loaded, setLoaded] = useState(false);
   const [page, setPage] = usePage(["assignments", "availability", "dashboard", "materials", "messages", "notifications", "packages", "payments", "progress", "sessions", "students"]);
   const [students, setStudents] = useState([]);
   const [sessions, setSessions] = useState([]);
@@ -111,6 +115,7 @@ export default function TutorDashboard() {
       setStudents(Object.entries(d).map(([id, v]) => ({ id, ...v })));
     });
     onValue(ref(db, `tutors/${currentUser.uid}/sessions`), snap => {
+      setLoaded(true);
       const d = snap.val() || {};
       setSessions(Object.entries(d).map(([id, v]) => ({ id, ...v })).sort((a, b) => (b.utcTimestamp||0) - (a.utcTimestamp||0)));
     });
@@ -592,14 +597,25 @@ export default function TutorDashboard() {
                     {next && next.utcTimestamp && <div className="countdown"><span className="live"></span>Starts {getCountdown(next.utcTimestamp)}</div>}
                   </div>
                   <div className="cta">
-                    <button className="btn-hero" onClick={() => setPage("sessions")}>{next ? "Open lessons" : "Schedule a lesson"}</button>
+                    {next && joinWindow(next) && meetingLink && <a className="btn-hero join" href={meetingLink} target="_blank" rel="noreferrer">Join lesson</a>}
+                    <button className={next && joinWindow(next) && meetingLink ? "btn-hero ghost" : "btn-hero"} onClick={() => setPage("sessions")}>{next ? "Open lessons" : "Schedule a lesson"}</button>
                     <button className="btn-hero ghost" onClick={() => setPage("students")}>My students</button>
                   </div>
                 </div>
               );
             })()}
 
-            <div className="stats-row">
+            <div className="card link-card">
+              <div className="card-header" style={{marginBottom:10}}><h3>Lesson meeting link</h3>{meetingLink && <span className="badge badge-green">Saved</span>}</div>
+              <p style={{fontSize:13,color:"var(--text-secondary)",marginBottom:10}}>Paste your Zoom or Google Meet link. Students get a "Join lesson" button 10 minutes before each lesson.</p>
+              <div style={{display:"flex",gap:10,flexWrap:"wrap"}}>
+                <input className="link-input" placeholder="https://meet.google.com/..." value={linkDraft ?? meetingLink} onChange={e => setLinkDraft(e.target.value)} />
+                <button className="btn btn-blue" disabled={linkDraft === null || linkDraft === meetingLink} onClick={async () => { await saveMeetingLink(linkDraft); setLinkDraft(null); toast.success("Meeting link saved"); }}>Save link</button>
+              </div>
+            </div>
+
+            {!loaded ? <div className="stats-row">{[0,1,2,3].map(i => <div key={i} className="stat-card skeleton-card"><div className="skeleton sk-line"></div><div className="skeleton sk-big"></div></div>)}</div> : null}
+            <div className="stats-row" style={loaded ? undefined : {display:"none"}}>
               <div className="stat-card"><div className="stat-label">Students</div><div className="stat-value color-blue"><CountUp value={students.length} /></div><div className="stat-sub">Active learners</div></div>
               <div className="stat-card"><div className="stat-label">Sessions</div><div className="stat-value color-teal"><CountUp value={completedSessions} /></div><div className="stat-sub">Completed</div></div>
               <div className="stat-card"><div className="stat-label">Assignments</div><div className="stat-value color-amber"><CountUp value={assignments.length} /></div><div className="stat-sub">Total given</div></div>

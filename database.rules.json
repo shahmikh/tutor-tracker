@@ -1,0 +1,136 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    "users": {
+      ".read": "auth != null && (root.child('users').child(auth.uid).child('role').val() === 'tutor')",
+      "$uid": {
+        ".read": "auth != null && (auth.uid === $uid || (root.child('users').child(auth.uid).child('role').val() === 'tutor'))",
+        ".write": "auth != null && auth.uid === $uid",
+        "role": {
+          ".validate": "newData.val() === 'student' || newData.val() === data.val()"
+        },
+        "notifications": {
+          ".write": "auth != null && (auth.uid === $uid || (root.child('users').child(auth.uid).child('role').val() === 'tutor') || root.child('users').child($uid).child('role').val() === 'tutor')"
+        }
+      }
+    },
+    "students": {
+      "$sid": {
+        ".read": "auth != null && (auth.uid === $sid || (root.child('users').child(auth.uid).child('role').val() === 'tutor'))",
+        "tutor": {
+          ".write": "auth != null && (root.child('users').child(auth.uid).child('role').val() === 'tutor')"
+        },
+        "packages": {
+          ".write": "auth != null && (root.child('users').child(auth.uid).child('role').val() === 'tutor')"
+        },
+        "materials": {
+          ".write": "auth != null && (root.child('users').child(auth.uid).child('role').val() === 'tutor')"
+        },
+        "sessions": {
+          ".write": "auth != null && (auth.uid === $sid || (root.child('users').child(auth.uid).child('role').val() === 'tutor'))"
+        },
+        "invoices": {
+          ".write": "auth != null && (root.child('users').child(auth.uid).child('role').val() === 'tutor')",
+          "$iid": {
+            "status": {
+              ".write": "auth != null && (auth.uid === $sid || (root.child('users').child(auth.uid).child('role').val() === 'tutor'))"
+            },
+            "proofUrl": {
+              ".write": "auth != null && (auth.uid === $sid || (root.child('users').child(auth.uid).child('role').val() === 'tutor'))"
+            },
+            "proofName": {
+              ".write": "auth != null && (auth.uid === $sid || (root.child('users').child(auth.uid).child('role').val() === 'tutor'))"
+            }
+          }
+        },
+        "assignments": {
+          ".write": "auth != null && (root.child('users').child(auth.uid).child('role').val() === 'tutor')",
+          "$aid": {
+            "status": {
+              ".write": "auth != null && (auth.uid === $sid || (root.child('users').child(auth.uid).child('role').val() === 'tutor'))"
+            },
+            "submittedNote": {
+              ".write": "auth != null && (auth.uid === $sid || (root.child('users').child(auth.uid).child('role').val() === 'tutor'))"
+            },
+            "submittedAt": {
+              ".write": "auth != null && (auth.uid === $sid || (root.child('users').child(auth.uid).child('role').val() === 'tutor'))"
+            },
+            "submissionUrl": {
+              ".write": "auth != null && (auth.uid === $sid || (root.child('users').child(auth.uid).child('role').val() === 'tutor'))"
+            },
+            "submissionName": {
+              ".write": "auth != null && (auth.uid === $sid || (root.child('users').child(auth.uid).child('role').val() === 'tutor'))"
+            }
+          }
+        }
+      }
+    },
+    "tutors": {
+      "$tid": {
+        ".read": "auth != null && auth.uid === $tid",
+        ".write": "auth != null && auth.uid === $tid",
+        "sessions": {
+          ".read": "auth != null && (root.child('students').child(auth.uid).child('tutor').child('uid').val() === $tid)",
+          ".write": "auth != null && (root.child('students').child(auth.uid).child('tutor').child('uid').val() === $tid)"
+        },
+        "invoices": {
+          "$iid": {
+            "status": {
+              ".write": "auth != null && (root.child('students').child(auth.uid).child('tutor').child('uid').val() === $tid)"
+            },
+            "proofUrl": {
+              ".write": "auth != null && (root.child('students').child(auth.uid).child('tutor').child('uid').val() === $tid)"
+            },
+            "proofName": {
+              ".write": "auth != null && (root.child('students').child(auth.uid).child('tutor').child('uid').val() === $tid)"
+            }
+          }
+        },
+        "assignments": {
+          "$aid": {
+            "status": {
+              ".write": "auth != null && (root.child('students').child(auth.uid).child('tutor').child('uid').val() === $tid)"
+            },
+            "submittedNote": {
+              ".write": "auth != null && (root.child('students').child(auth.uid).child('tutor').child('uid').val() === $tid)"
+            },
+            "submittedAt": {
+              ".write": "auth != null && (root.child('students').child(auth.uid).child('tutor').child('uid').val() === $tid)"
+            },
+            "submissionUrl": {
+              ".write": "auth != null && (root.child('students').child(auth.uid).child('tutor').child('uid').val() === $tid)"
+            },
+            "submissionName": {
+              ".write": "auth != null && (root.child('students').child(auth.uid).child('tutor').child('uid').val() === $tid)"
+            }
+          }
+        }
+      }
+    },
+    "availability": {
+      ".read": "auth != null",
+      "$tid": {
+        ".write": "auth != null && auth.uid === $tid"
+      }
+    },
+    "availabilityGrid": {
+      ".read": "auth != null",
+      "$tid": {
+        ".write": "auth != null && auth.uid === $tid"
+      }
+    },
+    "chats": {
+      "$chatId": {
+        ".read": "auth != null && $chatId.contains(auth.uid)",
+        ".write": "auth != null && $chatId.contains(auth.uid)"
+      }
+    },
+    "meetingLink": {
+      "$tid": {
+        ".read": "auth != null && (auth.uid === $tid || root.child('students').child(auth.uid).child('tutor').child('uid').val() === $tid)",
+        ".write": "auth != null && auth.uid === $tid"
+      }
+    }
+  }
+}

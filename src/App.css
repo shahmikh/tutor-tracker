@@ -278,3 +278,16 @@ button { font-family: inherit; }
   .card { overflow-x:auto; }
 }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+
+/* ===== skeleton loading + join button + link card ===== */
+.skeleton { background: linear-gradient(90deg, #E9EFF7 25%, #F6F9FD 37%, #E9EFF7 63%); background-size: 400% 100%; animation: shimmer 1.3s ease infinite; border-radius: 8px; }
+@keyframes shimmer { 0% { background-position: 100% 50%; } 100% { background-position: 0 50%; } }
+.skeleton-card { min-height: 104px; }
+.sk-line { height: 12px; width: 45%; margin-bottom: 14px; }
+.sk-big { height: 30px; width: 30%; }
+.btn-hero.join { background: #1E9E6A; display: inline-flex; align-items: center; gap: 8px; animation: pulseGlow 1.8s ease-in-out infinite; }
+.btn-hero.join::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: #fff; }
+.btn-hero.join:hover { background: #17855A; box-shadow: 0 8px 20px rgba(30,158,106,.4); }
+@keyframes pulseGlow { 0%,100% { box-shadow: 0 0 0 0 rgba(30,158,106,.5); } 50% { box-shadow: 0 0 0 10px rgba(30,158,106,0); } }
+.link-input { flex: 1; min-width: 220px; padding: 11px 14px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); font-size: 14px; font-family: inherit; color: var(--ink); }
+.link-input:focus { outline: none; border-color: var(--ink-2); box-shadow: 0 0 0 4px rgba(29,58,102,.10); }

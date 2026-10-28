@@ -5,6 +5,7 @@ import { useAuth } from "../context/AuthContext";
 import Sidebar from "../components/Sidebar";
 import Topbar from "../components/Topbar";
 import usePage from "../utils/usePage";
+import useMeetingLink, { joinWindow } from "../utils/useMeetingLink";
 import CountUp from "../components/CountUp";
 import toast from "react-hot-toast";
 import { format } from "date-fns";
@@ -28,10 +29,12 @@ function fmt12(t) {
 
 export default function StudentDashboard() {
   const { currentUser, userProfile } = useAuth();
+  const [loaded, setLoaded] = useState(false);
   const [page, setPage] = usePage(["assignments", "dashboard", "materials", "messages", "notifications", "packages", "payments", "progress", "sessions"]);
   const [assignments, setAssignments] = useState([]);
   const [sessions, setSessions] = useState([]);
   const [tutorInfo, setTutorInfo] = useState(null);
+  const [meetingLink] = useMeetingLink(tutorInfo?.uid);
   const [availability, setAvailability] = useState([]);
   const [notifications, setNotifications] = useState([]);
   const [unread, setUnread] = useState(0);
@@ -90,6 +93,7 @@ export default function StudentDashboard() {
       setAssignments(Object.entries(d).map(([id, v]) => ({ id, ...v })).sort((a,b) => b.createdAt - a.createdAt));
     });
     onValue(ref(db, `students/${currentUser.uid}/sessions`), snap => {
+      setLoaded(true);
       const d = snap.val() || {};
       setSessions(Object.entries(d).map(([id, v]) => ({ id, ...v })).sort((a,b) => (b.utcTimestamp||0) - (a.utcTimestamp||0)));
     });
@@ -327,14 +331,16 @@ export default function StudentDashboard() {
                     {next && next.utcTimestamp && <div className="countdown"><span className="live"></span>Starts {getCountdown(next.utcTimestamp)}</div>}
                   </div>
                   <div className="cta">
-                    {tutorInfo && <button className="btn-hero" onClick={() => setBookModal(true)}>Book a lesson</button>}
+                    {next && joinWindow(next) && meetingLink && <a className="btn-hero join" href={meetingLink} target="_blank" rel="noreferrer">Join lesson</a>}
+                    {tutorInfo && <button className={next && joinWindow(next) && meetingLink ? "btn-hero ghost" : "btn-hero"} onClick={() => setBookModal(true)}>Book a lesson</button>}
                     <button className="btn-hero ghost" onClick={() => setPage("assignments")}>My assignments</button>
                   </div>
                 </div>
               );
             })()}
 
-            <div className="stats-row">
+            {!loaded ? <div className="stats-row">{[0,1,2,3].map(i => <div key={i} className="stat-card skeleton-card"><div className="skeleton sk-line"></div><div className="skeleton sk-big"></div></div>)}</div> : null}
+            <div className="stats-row" style={loaded ? undefined : {display:"none"}}>
               <div className="stat-card"><div className="stat-label">Pending</div><div className="stat-value color-rose"><CountUp value={pending} /></div><div className="stat-sub">Assignments due</div></div>
               <div className="stat-card"><div className="stat-label">Submitted</div><div className="stat-value color-amber"><CountUp value={submitted} /></div><div className="stat-sub">Awaiting grade</div></div>
               <div className="stat-card"><div className="stat-label">Sessions</div><div className="stat-value color-blue"><CountUp value={upcomingSessions.length} /></div><div className="stat-sub">Upcoming</div></div>
